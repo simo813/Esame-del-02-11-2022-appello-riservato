@@ -33,8 +33,14 @@ class Controller:
                        f"# Vertici: {graph.number_of_nodes()}\n"
                        f"# Archi: {graph.number_of_edges()}\n"))
                    listConnectedComp = nx.connected_components(graph)
-
-
+                   for connectedComp in listConnectedComp:
+                       nPlaylist = 0
+                       number = 0
+                       for node in connectedComp:
+                           nPlaylist = node.nPlaylist
+                           number += 1
+                       self.view.txt_result.controls.append(ft.Text(
+                           f"Componente con {number} vertici, inseriti in {nPlaylist} playlist"))
 
                else:
                    self.view.txt_result.clean()
@@ -53,14 +59,24 @@ class Controller:
         self.view.update_page()
 
 
-    def handleStampaAdiacenze(self, e):
-       pass
-
-
 
 
     def handleMyPlaylist(self, e):
-       pass
+        try:
+            self.view.txt_result.clean()
+            dTot = int(self.view.txtInDTot.value)
+            optPath = self.model.getOptPath(dTot)
+            self.view.txt_result.controls.append(ft.Text(
+                f"La mia playlist è:"))
+            for track in optPath:
+                self.view.txt_result.controls.append(ft.Text(
+                    f"{track.Name}"))
+        except ValueError:
+            self.view.txt_result.clean()
+            self.view.txt_result.controls.append(ft.Text(
+                f"Inserisci un valore numerico di dTot"))
+        self.view.update_page()
+
 
 
 

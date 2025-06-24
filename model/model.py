@@ -7,7 +7,7 @@ from model.album import Album
 
 class Model:
     def __init__(self):
-        self.optPathBilancio = None
+        self.sumDuration = None
         self.optPath = None
         self.DAO = DAO()
         self.graph = None
@@ -33,74 +33,49 @@ class Model:
 
 
 
-
-
-
-    def getOptPath(self, partenza, destinazione, soglia):
+    def getOptPath(self, dTot):
         self.optPath = []
-        self.optPathBilancio = 0
-        bilancioPartenza = self.findBilancio(partenza)
-        print(partenza.AlbumId)
-        print(destinazione.AlbumId)
+        self.sumDuration = 0
+        largest_cc = max(nx.connected_components(self.graph), key=len)
 
-        self.recursion(
-            node = partenza,
-            destinazione = destinazione,
-            soglia = soglia,
-            partial=[partenza],
-            bilancioPartenza = bilancioPartenza,
-            optPathBilancioP=0
-
-        )
+        for node in largest_cc:
+            partial = [node]
+            print("Inizio ricorsione")
+            self.recursion(
+                node = node,
+                largest_cc = largest_cc,
+                partial= partial,
+                partialDuration=node.duration,
+                dTot=dTot
+            )
+            partial.pop()
+        print(self.sumDuration)
         print(self.optPath)
-        print(self.optPathBilancio)
         print("\nFINE\n")
 
         return self.optPath
 
-    def recursion(self, node, destinazione, soglia, partial, bilancioPartenza, optPathBilancioP):
-        graph = self.graph
+    def recursion(self, node, largest_cc, partial, partialDuration, dTot):
 
-        if node.__eq__(destinazione):
-            if optPathBilancioP > self.optPathBilancio:
-                print("\n---------------------------------")
-                print("aggiornamento self.optPathBilancio")
-                print(optPathBilancioP)
-                print(partial)
-                self.optPathBilancio = optPathBilancioP
-                self.optPath = copy.deepcopy(partial)
+        if len(partial) > len(self.optPath):
+            print("\n---------------------------------")
+            print("aggiornamento self.sumDuration")
+            print(partial)
+            self.sumDuration = partialDuration
+            self.optPath = copy.deepcopy(partial)
 
-        for node, successor, data in graph.out_edges(node, data=True):
-            if successor not in partial:
-                weight = graph[node][successor]['weight']
-                if weight > soglia:
-                    print("successore valido")
-                    bilancioSuccessor = self.findBilancio(successor)
-                    if bilancioSuccessor > bilancioPartenza:
-                        partial.append(successor)
-                        self.recursion(successor, destinazione, soglia, partial, bilancioPartenza, optPathBilancioP + 1)
-                        print("NUOVA RICORSIONE con aggiornamento optPathBilancioP\n")
-                        partial.pop()
-                    else:
-                        partial.append(successor)
-                        self.recursion(successor, destinazione, soglia, partial, bilancioPartenza, optPathBilancioP)
-                        print("NUOVA RICORSIONE\n")
-                        partial.pop()
+        for node in largest_cc:
+            durationN = node.duration
+            if node not in partial and durationN + partialDuration <= (dTot * 60):
+                print("node valido")
+                partial.append(node)
+                self.recursion(node, largest_cc, partial, durationN + partialDuration , dTot)
+                print("NUOVA RICORSIONE")
+                partial.pop()
+            else:
+                print("nodo non valido")
+                return
 
-
-    def findBilancio(self, node):
-        graph = self.graph
-        weightOutEdge = 0
-        weightInEdge = 0
-
-        for u, v, data in graph.out_edges(node, data=True):
-            weightOutEdge += data.get('weight', 1)
-
-        for u, v, data in graph.in_edges(node, data=True):
-            weightInEdge += data.get('weight', 1)
-
-        bilancio = weightInEdge - weightOutEdge
-        return bilancio
 
 
 

@@ -6,6 +6,7 @@ class Track:
     TrackId: int
     Name: str
     nPlaylist: int
+    duration: int
 
     def __str__(self):
         return self.Name
