@@ -12,11 +12,28 @@ class Model:
         self.DAO = DAO()
         self.graph = None
         self.listNodes = None
-        self.idMapAlbum = {}
+        self.idMapGenres = {}
+
+    def passGenres(self):
+        listGenres  = self.DAO.getGenres()
+        for genre in listGenres:
+            self.idMapGenres[genre.GenreId] = genre
+        return listGenres
 
 
-    def createGraph(self, canzoniN):
-        pass
+
+    def createGraph(self, genreId, tMin, tMax):
+        self.graph = nx.Graph()
+        listNodes = self.DAO.getNodes(genreId, tMin, tMax)
+        self.graph.add_nodes_from(listNodes)
+        for track1 in listNodes:
+            for track2 in listNodes:
+                if track1.nPlaylist == track2.nPlaylist and track1.TrackId != track2.TrackId and track1.TrackId > track2.TrackId:
+                    self.graph.add_edge(track1, track2)
+
+
+
+
 
 
     def getOptPath(self, partenza, destinazione, soglia):

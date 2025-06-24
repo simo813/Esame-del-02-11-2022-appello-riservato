@@ -13,7 +13,7 @@ class View(ft.UserControl):
         self.ddGenre = None
         self.ddGenreValue = None
         self._page = page
-        self._page.title = "TdP - Esame del 14/09/2022"
+        self._page.title = "TdP - Esame	del	02/11/2022	–	appello	riservato	"
         self._page.horizontal_alignment = 'CENTER'
         self._page.theme_mode = ft.ThemeMode.LIGHT
         # controller (it is not initialized. Must be initialized in the main, after the controller is created)
@@ -27,11 +27,11 @@ class View(ft.UserControl):
 
     def load_interface(self):
         # title
-        self._title = ft.Text("TdP - Esame del 14/09/2022", color="red", size=24)
+        self._title = ft.Text("TdP - Esame	del	02/11/2022	–	appello	riservato	", color="red", size=24)
         self._page.controls.append(self._title)
 
         #ROW1
-        self.ddGenre = ft.Dropdown(label="Genre", on_change=self.on_ddAlbum1_change)
+        self.ddGenre = ft.Dropdown(label="Genre", on_change=self.on_ddGenre_change)
         self._btnCreaGrafo = ft.ElevatedButton(text="Crea Grafo",
                                                on_click=self._controller.handleCreaGrafo)
         row1 = ft.Row([
@@ -71,6 +71,7 @@ class View(ft.UserControl):
         # List View where the reply is printed
         self.txt_result = ft.ListView(expand=1, spacing=10, padding=20, auto_scroll=True)
         self._page.controls.append(self.txt_result)
+        self._controller.fillDD()
         self._page.update()
 
     @property
@@ -90,7 +91,7 @@ class View(ft.UserControl):
         dlg.open = True
         self._page.update()
 
-    def on_ddAlbum1_change(self, e):
+    def on_ddGenre_change(self, e):
         self.ddGenreValue = self.ddGenre.value
         self.update_page()
 
